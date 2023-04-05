@@ -197,7 +197,7 @@ namespace Discord.API
 
         #region Core
         internal Task SendAsync(string method, string endpoint,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null)
+             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
             => SendAsync(method, endpoint, GetBucketId(method, endpoint), clientBucket, options);
         public async Task SendAsync(string method, string endpoint,
             BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
@@ -211,7 +211,7 @@ namespace Discord.API
         }
 
         internal Task SendJsonAsync(string method, string endpoint, object payload,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null)
+             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
             => SendJsonAsync(method, endpoint, payload, GetBucketId(method, endpoint), clientBucket, options);
         public async Task SendJsonAsync(string method, string endpoint, object payload,
             BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
@@ -226,7 +226,7 @@ namespace Discord.API
         }
 
         internal Task SendMultipartAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null)
+             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
             => SendMultipartAsync(method, endpoint, multipartArgs, GetBucketId(method, endpoint), clientBucket, options);
         public async Task SendMultipartAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
             BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
@@ -240,7 +240,7 @@ namespace Discord.API
         }
 
         internal Task<TResponse> SendAsync<TResponse>(string method, string endpoint,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null) where TResponse : class
+             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
             => SendAsync<TResponse>(method, endpoint, GetBucketId(method, endpoint), clientBucket, options);
         public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint,
             BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
@@ -253,7 +253,7 @@ namespace Discord.API
         }
 
         internal Task<TResponse> SendJsonAsync<TResponse>(string method, string endpoint, object payload,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null) where TResponse : class
+             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
             => SendJsonAsync<TResponse>(method, endpoint, payload, GetBucketId(method, endpoint), clientBucket, options);
         public async Task<TResponse> SendJsonAsync<TResponse>(string method, string endpoint, object payload,
             BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
@@ -268,7 +268,7 @@ namespace Discord.API
         }
 
         internal Task<TResponse> SendMultipartAsync<TResponse>(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null)
+             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
             => SendMultipartAsync<TResponse>(method, endpoint, multipartArgs, GetBucketId(method, endpoint), clientBucket, options);
         public async Task<TResponse> SendMultipartAsync<TResponse>(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
             BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
