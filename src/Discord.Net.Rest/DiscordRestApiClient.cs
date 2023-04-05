@@ -1380,7 +1380,8 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            await SendJsonAsync("POST", () => $"interactions/{interactionId}/{interactionToken}/callback", response, new BucketIds(), options: options);
+            var ids = new BucketIds(interactionId: interactionId);
+            await SendJsonAsync("POST", () => $"interactions/{interactionId}/{interactionToken}/callback", response, ids, options: options);
         }
         public async Task CreateInteractionResponseAsync(UploadInteractionFileParams response, ulong interactionId, string interactionToken, RequestOptions options = null)
         {
@@ -1392,7 +1393,7 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds();
+            var ids = new BucketIds(interactionId: interactionId);
             await SendMultipartAsync("POST", () => $"interactions/{interactionId}/{interactionToken}/callback", response.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
         }
         public async Task<Message> GetInteractionResponseAsync(string interactionToken, RequestOptions options = null)
@@ -1401,25 +1402,29 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            return await NullifyNotFound(SendAsync<Message>("GET", () => $"webhooks/{CurrentApplicationId}/{interactionToken}/messages/@original", new BucketIds(), options: options)).ConfigureAwait(false);
+            var ids = new BucketIds(webhookId: CurrentApplicationId);
+            return await NullifyNotFound(SendAsync<Message>("GET", () => $"webhooks/{CurrentApplicationId}/{interactionToken}/messages/@original", ids, options: options)).ConfigureAwait(false);
         }
         public async Task<Message> ModifyInteractionResponseAsync(ModifyInteractionResponseParams args, string interactionToken, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendJsonAsync<Message>("PATCH", () => $"webhooks/{CurrentApplicationId}/{interactionToken}/messages/@original", args, new BucketIds(), options: options);
+            var ids = new BucketIds(webhookId: CurrentApplicationId);
+            return await SendJsonAsync<Message>("PATCH", () => $"webhooks/{CurrentApplicationId}/{interactionToken}/messages/@original", args, ids, options: options);
         }
         public async Task<Message> ModifyInteractionResponseAsync(UploadWebhookFileParams args, string interactionToken, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendMultipartAsync<Message>("PATCH", () => $"webhooks/{CurrentApplicationId}/{interactionToken}/messages/@original", args.ToDictionary(), new BucketIds(), options: options);
+            var ids = new BucketIds(webhookId: CurrentApplicationId);
+            return await SendMultipartAsync<Message>("PATCH", () => $"webhooks/{CurrentApplicationId}/{interactionToken}/messages/@original", args.ToDictionary(), ids, options: options);
         }
         public async Task DeleteInteractionResponseAsync(string interactionToken, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
-            await SendAsync("DELETE", () => $"webhooks/{CurrentApplicationId}/{interactionToken}/messages/@original", new BucketIds(), options: options);
+            var ids = new BucketIds(webhookId: CurrentApplicationId);
+            await SendAsync("DELETE", () => $"webhooks/{CurrentApplicationId}/{interactionToken}/messages/@original", ids, options: options);
         }
 
         public async Task<Message> CreateInteractionFollowupMessageAsync(CreateWebhookMessageParams args, string token, RequestOptions options = null)
@@ -1432,10 +1437,11 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
+            var ids = new BucketIds(webhookId: CurrentApplicationId);
             if (!args.File.IsSpecified)
-                return await SendJsonAsync<Message>("POST", () => $"webhooks/{CurrentApplicationId}/{token}?wait=true", args, new BucketIds(), options: options).ConfigureAwait(false);
+                return await SendJsonAsync<Message>("POST", () => $"webhooks/{CurrentApplicationId}/{token}?wait=true", args, ids, options: options).ConfigureAwait(false);
             else
-                return await SendMultipartAsync<Message>("POST", () => $"webhooks/{CurrentApplicationId}/{token}?wait=true", args.ToDictionary(), new BucketIds(), options: options).ConfigureAwait(false);
+                return await SendMultipartAsync<Message>("POST", () => $"webhooks/{CurrentApplicationId}/{token}?wait=true", args.ToDictionary(), ids, options: options).ConfigureAwait(false);
         }
 
         public async Task<Message> CreateInteractionFollowupMessageAsync(UploadWebhookFileParams args, string token, RequestOptions options = null)
@@ -1448,7 +1454,7 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds();
+            var ids = new BucketIds(webhookId: CurrentApplicationId);
             return await SendMultipartAsync<Message>("POST", () => $"webhooks/{CurrentApplicationId}/{token}?wait=true", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
         }
 
@@ -1462,7 +1468,8 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendJsonAsync<Message>("PATCH", () => $"webhooks/{CurrentApplicationId}/{token}/messages/{id}", args, new BucketIds(), options: options).ConfigureAwait(false);
+            var ids = new BucketIds(webhookId: CurrentApplicationId);
+            return await SendJsonAsync<Message>("PATCH", () => $"webhooks/{CurrentApplicationId}/{token}/messages/{id}", args, ids, options: options).ConfigureAwait(false);
         }
 
         public async Task DeleteInteractionFollowupMessageAsync(ulong id, string token, RequestOptions options = null)
@@ -1471,7 +1478,8 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            await SendAsync("DELETE", () => $"webhooks/{CurrentApplicationId}/{token}/messages/{id}", new BucketIds(), options: options).ConfigureAwait(false);
+            var ids = new BucketIds(webhookId: CurrentApplicationId);
+            await SendAsync("DELETE", () => $"webhooks/{CurrentApplicationId}/{token}/messages/{id}", ids, options: options).ConfigureAwait(false);
         }
         #endregion
 
@@ -2342,17 +2350,19 @@ namespace Discord.API
             public ulong GuildId { get; internal set; }
             public ulong ChannelId { get; internal set; }
             public ulong WebhookId { get; internal set; }
+            public ulong InteractionId { get; internal set; }
             public string HttpMethod { get; internal set; }
 
-            internal BucketIds(ulong guildId = 0, ulong channelId = 0, ulong webhookId = 0)
+            internal BucketIds(ulong guildId = 0, ulong channelId = 0, ulong webhookId = 0, , ulong interactionId = 0)
             {
                 GuildId = guildId;
                 ChannelId = channelId;
                 WebhookId = webhookId;
+                InteractionId = interactionId;
             }
 
             internal object[] ToArray()
-                => new object[] { HttpMethod, GuildId, ChannelId, WebhookId };
+                => new object[] { HttpMethod, GuildId, ChannelId, WebhookId, InteractionId };
 
             internal Dictionary<string, string> ToMajorParametersDictionary()
             {
@@ -2363,6 +2373,8 @@ namespace Discord.API
                     dict["ChannelId"] = ChannelId.ToString();
                 if (WebhookId != 0)
                     dict["WebhookId"] = WebhookId.ToString();
+                if (InteractionId != 0)
+                    dict["InteractionId"] = InteractionId.ToString();
                 return dict;
             }
 
@@ -2374,6 +2386,7 @@ namespace Discord.API
                     "guildId" => 1,
                     "channelId" => 2,
                     "webhookId" => 3,
+                    "interactionId" => 4,
                     _ => null,
                 };
             }
