@@ -196,70 +196,55 @@ namespace Discord.API
         #endregion
 
         #region Core
-        internal Task SendAsync(string method, string endpoint,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
-            => SendAsync(method, endpoint, GetBucketId(method, endpoint), clientBucket, options);
         public async Task SendAsync(string method, string endpoint,
-            BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
+            ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
         {
             options ??= new RequestOptions();
             options.HeaderOnly = true;
-            options.BucketId = bucketId;
+            options.BucketId = GetBucketId(method, endpoint);
 
             var request = new RestRequest(RestClient, method, endpoint, options);
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
         }
 
-        internal Task SendJsonAsync(string method, string endpoint, object payload,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
-            => SendJsonAsync(method, endpoint, payload, GetBucketId(method, endpoint), clientBucket, options);
         public async Task SendJsonAsync(string method, string endpoint, object payload,
-            BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
+            ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
         {
             options ??= new RequestOptions();
             options.HeaderOnly = true;
-            options.BucketId = bucketId;
+            options.BucketId = GetBucketId(method, endpoint);
 
             string json = payload != null ? SerializeJson(payload) : null;
             var request = new JsonRestRequest(RestClient, method, endpoint, json, options);
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
         }
 
-        internal Task SendMultipartAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
-            => SendMultipartAsync(method, endpoint, multipartArgs, GetBucketId(method, endpoint), clientBucket, options);
         public async Task SendMultipartAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
-            BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
+            ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
         {
             options ??= new RequestOptions();
             options.HeaderOnly = true;
-            options.BucketId = bucketId;
+            options.BucketId = GetBucketId(method, endpoint);
 
             var request = new MultipartRestRequest(RestClient, method, endpoint, multipartArgs, options);
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
         }
 
-        internal Task<TResponse> SendAsync<TResponse>(string method, string endpoint,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
-            => SendAsync<TResponse>(method, endpoint, GetBucketId(method, endpoint), clientBucket, options);
         public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint,
-            BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
+            ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
         {
             options ??= new RequestOptions();
-            options.BucketId = bucketId;
+            options.BucketId = GetBucketId(method, endpoint);
 
             var request = new RestRequest(RestClient, method, endpoint, options);
             return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
         }
 
-        internal Task<TResponse> SendJsonAsync<TResponse>(string method, string endpoint, object payload,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
-            => SendJsonAsync<TResponse>(method, endpoint, payload, GetBucketId(method, endpoint), clientBucket, options);
         public async Task<TResponse> SendJsonAsync<TResponse>(string method, string endpoint, object payload,
-            BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
+            ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
         {
             options ??= new RequestOptions();
-            options.BucketId = bucketId;
+            options.BucketId = GetBucketId(method, endpoint);
 
             string json = payload != null ? SerializeJson(payload) : null;
 
@@ -267,14 +252,11 @@ namespace Discord.API
             return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
         }
 
-        internal Task<TResponse> SendMultipartAsync<TResponse>(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
-            => SendMultipartAsync<TResponse>(method, endpoint, multipartArgs, GetBucketId(method, endpoint), clientBucket, options);
         public async Task<TResponse> SendMultipartAsync<TResponse>(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
-            BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
+            ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
         {
             options ??= new RequestOptions();
-            options.BucketId = bucketId;
+            options.BucketId = GetBucketId(method, endpoint);
 
             var request = new MultipartRestRequest(RestClient, method, endpoint, multipartArgs, options);
             return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
@@ -2047,8 +2029,6 @@ namespace Discord.API
 
             int limit = args.Limit.GetValueOrDefault(int.MaxValue);
 
-            Expression<Func<string>> endpoint;
-
             var queryArgs = new StringBuilder();
             if (args.BeforeEntryId.IsSpecified)
             {
@@ -2182,7 +2162,7 @@ namespace Discord.API
             }
         }
 
-        string CanonizeEndpoint(string endpoint)
+        private static string CanonizeEndpoint(string endpoint)
         {
           endpoint = Regex.Replace(endpoint, @"\d{17,19}", ":id");
           endpoint = Regex.Replace(endpoint, @"\/reactions\/.*", "/reactions/:reaction");
