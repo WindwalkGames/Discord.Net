@@ -28,7 +28,7 @@ namespace Discord.WebSocket
                 ? (DataModel)model.Data.Value
                 : null;
 
-            Data = new SocketModalData(dataModel);
+            Data = new SocketModalData(dataModel, client, client.State, client.State.GetGuild(model.GuildId.GetValueOrDefault()), model.User.GetValueOrDefault());
         }
 
         internal new static SocketModal Create(DiscordSocketClient client, ModelBase model, ISocketMessageChannel channel, SocketUser user)
@@ -380,7 +380,7 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public override Task RespondWithModalAsync(Modal modal, RequestOptions options = null)
             => throw new NotSupportedException("You cannot respond to a modal with a modal!");
-            
+
         IModalInteractionData IModalInteraction.Data => Data;
     }
 }

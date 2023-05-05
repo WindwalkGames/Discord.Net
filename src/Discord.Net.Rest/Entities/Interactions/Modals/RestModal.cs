@@ -23,7 +23,7 @@ namespace Discord.Rest
                 ? (DataModel)model.Data.Value
                 : null;
 
-            Data = new RestModalData(dataModel);
+            Data = new RestModalData(dataModel, client, Guild);
         }
 
         internal new static async Task<RestModal> CreateAsync(DiscordRestClient client, ModelBase model, bool doApiCall)
@@ -32,7 +32,7 @@ namespace Discord.Rest
             await entity.UpdateAsync(client, model, doApiCall);
             return entity;
         }
-        
+
         private object _lock = new object();
 
         /// <summary>
